@@ -33,16 +33,46 @@ Argon processes a special syntax into a HTML string - Here's how that syntax is 
 -> output: `Let's get to a<br>new line!`
 ### Tag rules
 - Tag names may only contain letters (e.g. `a`) and hyphens (`-`), but no hyphen at the beginning
+### Combining single enclosing tags
+- Using a plus (`+`) sign one word enclosing tags can be subsequently nested
+- This, beside being simply more convenient, allows for accessing the inner content when using implicit anchorization (with the special hash attribute case)
 ### Subsequent characters
-- To have a tag directly follow a word, you use a vertical bar (`|`) inbetween them:
-`Very|strong//important|Text`<br>
--> output: `Very<strong>important</strong>Text`
+- To have a tag directly follow a word, you use a vertical bar (`|`) inbetween them:<br>
+`Very|strong//important|text`<br>
+-> `Very<strong>important</strong>text`
 ### Attributes
-- The beginning of an attribute is marked by a colon (`:`), followed by a attribute name, which is directly followed by a set of round or square brackets containing the attribute value
+- The beginning of an attribute is marked by a colon (`:`), followed by an attribute name, which is directly followed by a set of round or square brackets containing the attribute value
 - An attribute name must only consist of letters or hyphens
 - When needing a round bracket as part of a value, square brackets must be used and vice versa
-- The brackets along with their value may be omitted
+- The brackets along with their value may be omitted<br>
 `strong:class(bold ag):id(char-3):onclick[log('content')]:contenteditable//Argon`<br>
--> output: `<strong class="bold ag" id="char-3" onclick="log('content')" contenteditable>Argon</strong>`
+-> `<strong class="bold ag" id="char-3" onclick="log('content')" contenteditable>Argon</strong>`
+### Special attribute case: href
+- Using a hash character (`#`) immediately after the tag name (before potential attributes) unlocks a more convenient way of defining a `href` attribute with special values
+- A value may be written after the hash, but can be omitted - entering a value makes the `href` correspond to that value, omitting it will take the tag value instead. There are multiple ways of processing the attribute:
+#### Anchorization
+- Anchorization is the default behaviour of the hash syntax: it converts a value into a link to a local id
+- Using an explicit value:<br>
+`A property - see a#property//here!`<br>
+-> `A property - see <a href="#property">here</a>!`
+- The implicit way:<br>
+`A property - see a#//property!`<br>
+-> `A property - see <a href="#property">property</a>!`
+#### Transferprotocolization
+- This wonderful name refers to the hash syntax converting a value automatically into a link (with its hypertext transfer protocol (http))
+- This is done by appending a exclamation or question mark, for https and http respectively, to the hash character:
+- With an explicitly defined URL:<br>
+`More info on a#!hallo89.net<//my website//>!`<br>
+-> `More info on <a href="https://hallo89.net">my website</a>!`
+`Unsecure info on a#?hallo89.net<//my website//>...`<br>
+-> `Unsecure info on <a href="http://hallo89.net">my website</a>...`
+- And implicitly:<br>
+`a#!//hallo89.net, that's my website`<br>
+-> `<a href="https://hallo89.net">hallo89.net</a>, that's my website`
+`a#?//hallo89.net, that's my unsecure website`<br>
+-> `<a href="http://hallo89.net">hallo89.net</a>, that's my unsecure website`
 
-**Time is running low, I will finish the docs later!**
+- An explicit value may not contain any of chese characters: whitespace or any of `,?!:/` (The slash doesn't make much sense here, I will see about removing it from the exceptions)
+- For using _any_ character in the value, a round or square bracket may be used. This is like with attributes, the bracket type itself may not be part of the value: when needing a round bracket in a value, use square brackets and vice versa<br>
+`a#(weird::id/syntax!)//property`<br>
+-> `<a href="#weird::id/syntax!">property</a>`
