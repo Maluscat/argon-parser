@@ -72,6 +72,7 @@ Argon processes a special syntax into a HTML string - Here's how that syntax is 
 `a#?//hallo89.net, that's my unsecure website`<br>
 -> `<a href="http://hallo89.net">hallo89.net</a>, that's my unsecure website`
 
+--
 - An explicit value may not contain any of chese characters: whitespace or any of `,?!:/` (The slash doesn't make much sense here, I will see about removing it from the exceptions)
 - For using _any_ character in the value, a round or square bracket may be used. This is like with attributes, the bracket type itself may not be part of the value: when needing a round bracket in a value, use square brackets and vice versa<br>
 `a#(weird::id/syntax!)//property`<br>
