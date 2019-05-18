@@ -2,7 +2,7 @@
   "name": "argon-parser",
   "version": "1.0.3",
   "description": "Compiling a custom syntax into full-fledged HTML, offering many advantages while eliminating tedious and repetitive practices",
-  "main": "argon.js",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/hallo89/argon-parser.git"
