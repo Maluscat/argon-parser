@@ -41,7 +41,9 @@ div<//inner html content//>
 ```
 -> output: `<div>inner html content</div>`
 ### One word enclosing tags
-`This is strong//Argon parser`<br>
+```
+This is strong//Argon parser
+```
 -> output: `This is <strong>Argon</strong> parser`
 - The single word content is stopped by whitespace or any of `. , ? !`
 ### Non-closing tags
