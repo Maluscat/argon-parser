@@ -1,6 +1,6 @@
 {
   "name": "argon-parser",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Compiling a custom syntax into full-fledged HTML, offering many advantages while eliminating tedious and repetitive practices",
   "main": "index.js",
   "repository": {
