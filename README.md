@@ -14,7 +14,7 @@ npm install argon-parser
 ```
 Obviously, [Yarn](https://yarnpkg.com) works too as it uses the npm package registry for its packages as well:
 ```
-yarn add argon-parser@1.0.0
+yarn add argon-parser
 ```
 ### In the browser
 Argon can also be used directly in the browser.
@@ -67,7 +67,7 @@ Check out a#!:class(anchor)+strong:class(bold)//github.com/Hallo89/argon-parser.
 ```
 -> `Check out <a href="https://github.com/Hallo89/argon-parser" class="anchor"><strong class="bold">github.com/Hallo89/argon-parser</strong></a>.`
 ### Subsequent characters
-- To have a tag directly follow a word, you use a vertical bar (`|`) inbetween them:
+- To have a tag directly follow a word, you use a vertical bar (`|`) in between them:
 ```
 Very|strong//important|text
 ```
@@ -123,7 +123,7 @@ a#?//hallo89.net, that's my unsecure website
 -> `<a href="http://hallo89.net">hallo89.net</a>, that's my unsecure website`
 
 ---
-- An explicit value may not contain any of chese characters: whitespace or any of `,?!:/` (The slash doesn't make much sense here, I will see about removing it from the exceptions)
+- An explicit value may not contain any of following characters: whitespace or any of `,?!:/` (The slash doesn't make much sense here, I will see about removing it from the exceptions)
 - For using _any_ character in the value, a round or square bracket may be used. This is like with attributes, the bracket type itself may not be part of the value: when needing a round bracket in a value, use square brackets and vice versa<br>
 
 ```
