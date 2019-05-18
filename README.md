@@ -53,8 +53,8 @@ Let's get to a/br!//new line!
 -> output: `Let's get to a<br>new line!`
 ### Tag rules
 - Tag names may only contain letters (e.g. `a`) and hyphens (`-`), but no hyphen at the beginning
-### Combining single enclosing tags
-- Using a plus (`+`) sign, one word enclosing tags can be subsequently nested
+### Combining tags
+- Using a plus (`+`) sign, tags can be subsequently nested
 - This, beside being simply more convenient, allows for accessing the inner content when using implicit anchorization (with the special hash attribute case)
 ```
 this is em+strong//important!
@@ -63,7 +63,7 @@ this is em+strong//important!
 
 A more advanced example with attributes and anchorization (see below):
 ```
-Check out a#!:class(anchor)+strong:class(bold)//github.com/Hallo89/argon-parser.
+Check out a#!:class(anchor)+strong:class(bold)<//github.com/hallo89/argon-parser//>.
 ```
 -> `Check out <a href="https://github.com/Hallo89/argon-parser" class="anchor"><strong class="bold">github.com/Hallo89/argon-parser</strong></a>.`
 ### Subsequent characters
