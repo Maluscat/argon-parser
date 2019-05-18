@@ -28,13 +28,13 @@ This allows you to always have the latest version when it gets pushed to GitHub.
 The other way is, well, download the script from its repo and include it with a script in your HTML file.. That was easy.
 
 ---
-After having imported the script, you can just go ahead and parse your favorite Argon syntax ([documented below](#documentation)) by calling the `argon` function. For example: `argon("This is s//probably em<//most likely//> useful")` (outputs `This is <s>probably</s> <em>most likely</em> useful`).<br>
+After having imported the script, you can just go ahead and parse your favorite Argon syntax ([documented below](#documentation)) by calling the `parse` function - in the `argon` object in the browser or in the assigned variable after requiring on Node.js. For example: `argon.parse("This is s//probably em<//most likely//> useful")` (outputs `This is <s>probably</s> <em>most likely</em> useful`).<br>
 Note that Argon is only made for HTML _snippets_, for example for small segments of formatted text in a database (like the example in the introduction)!<br>
 Also note that Argon does not compile into actual elemented HTML, it just converts a string into a different string - Use innerHTML or insertAdjacentHTML for that.
 
 ---
 ## Documentation
-Argon processes a special syntax into a HTML string with the `argon` function - Here's how that syntax looks:
+Argon processes a special syntax into a HTML string with the `parse` function in the `argon` object (browser) or assigned variable (Node.js) - Here's how that syntax looks:
 ### Simple enclosing tags
 ```
 div<//inner html content//>
