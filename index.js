@@ -33,17 +33,17 @@ const argon = {};
   }
   reg.ref = reg.href.case + reg.href.amplfr + '(?:' + reg.href.not + '*?|' + reg.group.n + ')';
   reg.attrib = '(?:' + reg.ref + ')?(?::' + reg.attr.name + reg.group.n + '?)';
-  reg.combiTag = '((?:' + reg.tag + reg.attrib + '*\\+)*)';
-  reg.base = '(?!-)(' + reg.tag + ')(' + reg.attrib + '*)';
+  reg.base = '(' + reg.tag + ')(' + reg.attrib + '*)';
+  reg.combiTag = '(?!-)((?:' + reg.tag + reg.attrib + '*\\+)*)' + reg.base;
 
   //Holding all parsing relevant expressions
   const rgx = {
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
-    singleWord: reg.delimiter + '(?!-)' + reg.combiTag + '(' + reg.tag + ')(' + reg.attrib + '*)\\/\\/(?!>)([^'+reg.not+']+?)(?!\\/\\/)(?:\\|(?=[^'+reg.not+'])|(?=$|['+reg.not+']))',
-    multiWord: reg.delimiter + reg.base + '<\\/\\/((?:.(?!<\\/\\/))*?)\\/\\/>',
-    singleTag: '\\/' + reg.base + '!\\/\\/'
+    singleWord: reg.delimiter + reg.combiTag + '\\/\\/(?!>)([^'+reg.not+']+?)(?!\\/\\/)(?:\\|(?=[^'+reg.not+'])|(?=$|['+reg.not+']))',
+    multiWord: reg.delimiter + reg.combiTag + '<\\/\\/((?:.(?!<\\/\\/))*?)\\/\\/>',
+    singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
 
   //Converting everything in rgx into a (global) RegExp
@@ -53,7 +53,7 @@ const argon = {};
     for (var i = 0; i < rgxKeys.length; i++) rgx[rgxKeys[i]] = new RegExp(rgx[rgxKeys[i]], 'g');
   })();
 
-  const comp = {
+  const comp = { //components
     ref: function(ref, content = false) {
       return ref.replace(rgx.ref, function(match, amplifier, value, value2, value3) {
         //value = normal # value; value2 = # round brackets; value3 = # square brackets
@@ -94,8 +94,8 @@ const argon = {};
         });
       } else return '';
     },
-    singleWord: function(str) {
-      return str.replace(rgx.singleWord, function(match, combiTags, tag, attr, content) {
+    baseTag: function (str, expr) {
+      return str.replace(expr, function(match, combiTags, tag, attr, content) {
         attr = comp.attributes(attr, content);
         let startTag = '<' + tag + attr + '>';
         let endTag = '</' + tag + '>';
@@ -109,13 +109,13 @@ const argon = {};
         return startTag + content + endTag;
       });
     },
+    singleWord: function(str) {
+      return comp.baseTag(str, rgx.singleWord);
+    },
     multiWord: function(str) {
       //Indefinite looping required as tags can be nested, leading to an imprecise global match
       while(rgx.multiWord.test(str)) {
-        str = str.replace(rgx.multiWord, function(match, tag, attr, content) {
-          attr = comp.attributes(attr, content);
-          return '<' + tag + attr + '>' + content + '</' + tag + '>';
-        });
+        str = comp.baseTag(str, rgx.multiWord);
       }
       return str;
     },
