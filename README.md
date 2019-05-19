@@ -1,6 +1,11 @@
 # Argon parser
 (A full introduction and documentation will (hopefully) soon be delivered on my website)
 
+- [Introduction](#introduction)
+- [Getting started](#getting-started)
+- [Documentation](#documentation)
+- [Version Notice](#version-notice)
+- [Licensing](#licensing)
 ---
 ## Introduction
 While converting a large documentation into a JSON format, I was quickly getting tired of writing the large amount of HTML tags by hand. That's why I began thinking of a simple, sophisticated syntax for writing HTML snippets which should increase the productivity by being very easy to write while decreasing tiring boilerplate, being only as minimal as needed to be distinguishable and efficient - and it's here: _Argon_
@@ -31,6 +36,11 @@ The other way is, well, download the script from its repo and include it with a 
 After having imported the script, you can just go ahead and parse your favorite Argon syntax ([documented below](#documentation)) by calling the `parse` function - in the `argon` object in the browser or in the assigned variable after requiring on Node.js. For example: `argon.parse("This is s//probably em<//most likely//> useful")` (outputs `This is <s>probably</s> <em>most likely</em> useful`).<br>
 Note that Argon is only made for HTML _snippets_, for example for small segments of formatted text in a database (like the example in the introduction)!<br>
 Also note that Argon does not compile into actual elemented HTML, it just converts a string into a different string - Use innerHTML or insertAdjacentHTML for that.
+
+---
+## Version notice
+Many of the third digit version increases only refer to readme changes or other minor things to be pushed to npm which don't relate to the actual code.
+because of that, only releases that impact the user experience will be marked in the GitHub [releases tab](https://github.com/Hallo89/argon-parser/releases), for example new features (second digit increases) or bug fixes.
 
 ---
 ## Documentation
@@ -130,3 +140,7 @@ a#?//hallo89.net, that's my unsecure website
 a#(weird::id/syntax!)//property
 ```
 -> `<a href="#weird::id/syntax!">property</a>`
+
+---
+## Licensing
+This project is licensed under the [MIT license](https://github.com/Hallo89/argon-parser/blob/master/LICENSE)
