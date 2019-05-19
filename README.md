@@ -50,6 +50,12 @@ Argon processes a special syntax into a HTML string with the `parse` function in
 div<//inner html content//>
 ```
 -> output: `<div>inner html content</div>`
+- As of version 1.2.0, an alternative syntax is available, using the characters `[]`:
+```
+div[//inner html content//]
+```
+-> output: `<div>inner html content</div>`
+- This latter syntax has been added for snippets which use to be escaped `<>` characters
 ### One word enclosing tags
 ```
 This is strong//Argon parser
@@ -66,6 +72,7 @@ Let's get to a/br!//new line!
 ### Combining tags
 - Using a plus (`+`) sign, tags can be subsequently nested
 - This, beside being simply more convenient, allows for accessing the inner content when using implicit anchorization (with the special hash attribute case)
+- Prior to 1.1.0, only one word enclosing tags could have additional tags attached to them
 ```
 this is em+strong//important!
 ```
@@ -95,7 +102,7 @@ strong:class(bold ag):id(char-3):onclick[log('content')]:contenteditable//Argon
 - Using a hash character (`#`) immediately after the tag name (before potential attributes) unlocks a more convenient way of defining a `href` attribute with special values
 - A value may be written after the hash, but can be omitted - entering a value makes the `href` correspond to that value, omitting it will take the tag value instead. There are multiple ways of processing the attribute:
 #### Anchorization
-- Anchorization is the default behaviour of the hash syntax: it converts a value into a link to a local id
+- _Anchorization_ is the default behaviour of the hash syntax: it converts a value into a link to a local id
 
 Using an explicit value:
 ```
@@ -108,6 +115,7 @@ The implicit way:
 A property - see a#//property!
 ```
 -> `A property - see <a href="#property">property</a>!`
+- For convenience, the term _anchorization_ refers to every behaviour invoked with the hash (So also _Transferprotocolization_)
 #### Transferprotocolization
 - This wonderful name refers to the hash syntax converting a value automatically into a link (with its hypertext transfer protocol (http))
 - This is done by appending a exclamation or question mark, for https and http respectively, to the hash character:

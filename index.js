@@ -23,10 +23,26 @@ const argon = {};
       amplfr: '[?!]?',
       not: '(?![(\\[])[^\\s,?!:/]'
     },
+    multi: {
+      start: [
+        '\\<',
+        '\\['
+      ],
+      end: [
+        '\\>',
+        '\\]',
+      ]
+    },
     tag: '[\\w-]+',
     not: '\\s,.?!',
     delimiter: '\\|?'
   };
+  reg.multiBase = new Array(reg.multi.start.length);
+  (function() { //Constructing the syntax variations at multiWord tags
+    for (var i = 0; i < reg.multiBase.length; i++) {
+      reg.multiBase[i] = reg.multi.start[i] + '\\/\\/((?:.(?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i];
+    }
+  })();
   reg.group = { //n = not grouped, g = grouped
     n: '(?:' + reg.attr.start[0] + reg.attr.value[0] + reg.attr.end[0] + '|' + reg.attr.start[1] + reg.attr.value[1] + reg.attr.end[1] + ')',
     g: '(?:' + reg.attr.start[0] + '(' + reg.attr.value[0] + ')' + reg.attr.end[0] + '|' + reg.attr.start[1] + '(' + reg.attr.value[1] + ')' + reg.attr.end[1] + ')'
@@ -42,7 +58,7 @@ const argon = {};
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
     singleWord: reg.delimiter + reg.combiTag + '\\/\\/(?!>)([^'+reg.not+']+?)(?!\\/\\/)(?:\\|(?=[^'+reg.not+'])|(?=$|['+reg.not+']))',
-    multiWord: reg.delimiter + reg.combiTag + '<\\/\\/((?:.(?!<\\/\\/))*?)\\/\\/>',
+    multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase[0] + '|' + reg.multiBase[1] + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
 
