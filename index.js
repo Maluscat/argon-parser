@@ -70,7 +70,8 @@ const argon = {};
   })();
 
   const comp = { //components
-    ref: function(ref, content = false) {
+    ref: function(ref, content) {
+      content = content || false;
       return ref.replace(rgx.ref, function(match, amplifier, value, value2, value3) {
         //value = normal # value; value2 = # round brackets; value3 = # square brackets
         let val = (value ? value : (value2 ? value2 : (value3 ? value3 : null)));
@@ -97,7 +98,8 @@ const argon = {};
         return 'href="' + val + '"';
       });
     },
-    attributes: function(attribs, content = false) {
+    attributes: function(attribs, content) {
+      content = content || false;
       if (attribs) {
         return attribs.replace(rgx.attributes, function(match, ref, name, value, value2) {
           //value = round brackets; value2 = square brackets
