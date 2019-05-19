@@ -131,7 +131,7 @@ const argon = {};
   argon.comp = comp;
 })();
 
-argon.parse = function(string) { //on npm with `exports`
+(typeof exports != 'undefined' && exports != null ? exports : argon).parse = function(string) { //`exports` for npm, `argon` for the web
   string = argon.comp.singleWord(string);
   string = argon.comp.multiWord(string);
   string = argon.comp.singleTag(string);
