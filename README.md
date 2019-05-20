@@ -59,9 +59,9 @@ As of version 1.2.0, a second parameter can be defined in `parse`, which is the 
 - This mode strips the input string from all Argon syntax and does not parse it
 - This is for example very useful when having an argonized heading which should be defined as a hash id as well
 ```
-argon.parse("Look at the code//argon object", true);
+argon.parse("code//Argon is em//pretty nice", true);
 ```
--> `Look at the argon object`
+-> `Argon is pretty nice`
 ### Internal properties
 Two additional properties are stored in the main object which have no relevancy to the user, but are very helpful for developing and maybe other devs want to look into Argon a bit deeper
 - `rgx`: An object containing every final [Regular Expression](https://www.regular-expressions.info/) used for parsing
@@ -74,9 +74,9 @@ Two additional properties are stored in the main object which have no relevancy 
 div<//inner html content//>
 ```
 -> output: `<div>inner html content</div>`
-- Since version 1.2.0, an alternative syntax is available, using the characters `[]`:
+- Since version 1.2.1, an alternative syntax is available, using the characters `{}`:
 ```
-div[//inner html content//]
+div{//inner html content//}
 ```
 -> output: `<div>inner html content</div>`
 - This latter syntax has been added for snippets which use to-be-escaped `<>` characters

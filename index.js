@@ -21,16 +21,16 @@ const argon = {};
     href: {
       case: '#',
       amplfr: '[?!]?',
-      not: '(?![(\\[])[^\\s,?!:/]'
+      not: '(?![(\\[])[^\\s,?!:<{/]'
     },
     multi: {
       start: [
         '\\<',
-        '\\['
+        '\\{'
       ],
       end: [
         '\\>',
-        '\\]',
+        '\\}',
       ]
     },
     tag: '[\\w-]+',
@@ -112,8 +112,9 @@ const argon = {};
         });
       } else return '';
     },
-    baseTag: function (str, expr, dry) {
-      return str.replace(expr, function(match, combiTags, tag, attr, content) {
+    baseTag: function(str, expr, dry) {
+      return str.replace(expr, function(match, combiTags, tag, attr, value, value2) {
+        const content = value || value2;
         if (dry) {
           return content;
         } else {
