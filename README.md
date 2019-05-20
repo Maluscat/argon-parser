@@ -75,7 +75,7 @@ div<//inner html content//>
 ```
 -> output: `<div>inner html content</div>`
 
-- Since version 1.2.1, an alternative syntax is available, using the characters `{}`:
+Since version 1.2.1, an alternative syntax is available, using the characters `{}`:
 ```
 div{//inner html content//}
 ```
