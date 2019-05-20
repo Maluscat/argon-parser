@@ -112,35 +112,43 @@ const argon = {};
         });
       } else return '';
     },
-    baseTag: function (str, expr) {
+    baseTag: function (str, expr, dry) {
       return str.replace(expr, function(match, combiTags, tag, attr, content) {
-        attr = comp.attributes(attr, content);
-        let startTag = '<' + tag + attr + '>';
-        let endTag = '</' + tag + '>';
-        if (combiTags) {
-          startTag = combiTags.replace(rgx.combiTags, function(multiTags, extraTag, attribs) {
-            endTag += '</' + extraTag + '>';
-            attribs = comp.attributes(attribs, content);
-            return '<' + extraTag + attribs + '>';
-          }) + startTag;
+        if (dry) {
+          return content;
+        } else {
+          attr = comp.attributes(attr, content);
+          let startTag = '<' + tag + attr + '>';
+          let endTag = '</' + tag + '>';
+          if (combiTags) {
+            startTag = combiTags.replace(rgx.combiTags, function(multiTags, extraTag, attribs) {
+              endTag += '</' + extraTag + '>';
+              attribs = comp.attributes(attribs, content);
+              return '<' + extraTag + attribs + '>';
+            }) + startTag;
+          }
+          return startTag + content + endTag;
         }
-        return startTag + content + endTag;
       });
     },
-    singleWord: function(str) {
-      return comp.baseTag(str, rgx.singleWord);
+    singleWord: function(str, dry) {
+      return comp.baseTag(str, rgx.singleWord, dry);
     },
-    multiWord: function(str) {
+    multiWord: function(str, dry) {
       //Indefinite looping required as tags can be nested, leading to an imprecise global match
       while(rgx.multiWord.test(str)) {
-        str = comp.baseTag(str, rgx.multiWord);
+        str = comp.baseTag(str, rgx.multiWord, dry);
       }
       return str;
     },
-    singleTag: function(str) {
+    singleTag: function(str, dry) {
       return str.replace(rgx.singleTag, function(match, tag, attr) {
-        attr = comp.attributes(attr);
-        return '<' + tag + attr + '>';
+        if (dry) {
+          return '';
+        } else {
+          attr = comp.attributes(attr);
+          return '<' + tag + attr + '>';
+        }
       });
     }
   }
@@ -149,9 +157,11 @@ const argon = {};
   argon.comp = comp;
 })();
 
-(typeof exports != 'undefined' && exports != null ? exports : argon).parse = function(string) { //`exports` for npm, `argon` for the web
-  string = argon.comp.singleWord(string);
-  string = argon.comp.multiWord(string);
-  string = argon.comp.singleTag(string);
+//`exports` for npm, `argon` for the web
+(typeof exports != 'undefined' && exports != null ? exports : argon).parse = function(string, dry) {
+  dry = dry === true ? dry : false;
+  string = argon.comp.singleWord(string, dry);
+  string = argon.comp.multiWord(string, dry);
+  string = argon.comp.singleTag(string, dry);
   return string;
 }
