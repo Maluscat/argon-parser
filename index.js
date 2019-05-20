@@ -42,7 +42,7 @@ const argon = {};
   (function() { //Constructing the syntax variations at multiWord tags
     for (var i = 0; i < reg.multiBase.length; i++) {
       reg.singleNot += reg.multi.end[i];
-      reg.multiBase[i] = reg.multi.start[i] + '\\/\\/((?:.(?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i];
+      reg.multiBase[i] = reg.multi.start[i] + '\\/\\/((?:[\\d\\D](?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i];
     }
     reg.singleNot = '(?![' + reg.singleNot + '])';
   })();

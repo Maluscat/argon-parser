@@ -23,7 +23,7 @@ Obviously, [Yarn](https://yarnpkg.com) works too as it uses the npm package regi
 yarn add argon-parser
 ```
 ### In the browser
-Argon can also be used directly in the browser.
+Argon can also be used directly in the browser:
 #### Automatic fetching
 One way to do that is to fetch the script from its repository's website directly in your HTML file:
 ```
