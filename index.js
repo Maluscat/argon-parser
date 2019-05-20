@@ -37,11 +37,14 @@ const argon = {};
     not: '\\s,.?!',
     delimiter: '\\|?'
   };
+  reg.singleNot = '';
   reg.multiBase = new Array(reg.multi.start.length);
   (function() { //Constructing the syntax variations at multiWord tags
     for (var i = 0; i < reg.multiBase.length; i++) {
+      reg.singleNot += reg.multi.end[i];
       reg.multiBase[i] = reg.multi.start[i] + '\\/\\/((?:.(?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i];
     }
+    reg.singleNot = '(?![' + reg.singleNot + '])';
   })();
   reg.group = { //n = not grouped, g = grouped
     n: '(?:' + reg.attr.start[0] + reg.attr.value[0] + reg.attr.end[0] + '|' + reg.attr.start[1] + reg.attr.value[1] + reg.attr.end[1] + ')',
@@ -57,7 +60,7 @@ const argon = {};
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
-    singleWord: reg.delimiter + reg.combiTag + '\\/\\/(?!>)([^'+reg.not+']+?)(?!\\/\\/)(?:\\|(?=[^'+reg.not+'])|(?=$|['+reg.not+']))',
+    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '([^'+reg.not+']+?)(?!\\/\\/)(?:\\|(?=[^'+reg.not+'])|(?=$|['+reg.not+']))',
     multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase[0] + '|' + reg.multiBase[1] + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
