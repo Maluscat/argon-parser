@@ -27,7 +27,7 @@ Argon can also be used directly in the browser:
 #### Automatic fetching
 One way to do that is to fetch the script from its repository's website directly in your HTML file:
 ```
-<script src="https://hallo89.github.io/argon-parser/argon.js"></script>
+<script src="https://hallo89.github.io/argon-parser/index.js"></script>
 ```
 This allows you to always have the latest version when it gets pushed to GitHub. However, as this doesn't utilize [SemVer](https://semver.org) processing, it has a chance to break but this is not very likely as the syntax is pretty much stable already.
 #### Downloading it
