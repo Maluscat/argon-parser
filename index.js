@@ -33,6 +33,7 @@ const argon = {};
         '\\}',
       ]
     },
+    empty: '\\.|',
     tag: '[\\w-]+',
     not: '\\s,.?!',
     delimiter: '\\|?'
@@ -60,7 +61,7 @@ const argon = {};
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
-    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '([^'+reg.not+']+?)(?!\\/\\/)(?:\\|(?=[^'+reg.not+'])|(?=$|['+reg.not+']))',
+    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?!\\/\\/)(?:\\|(?=[^'+reg.not+'])|(?=$|['+reg.not+'])))',
     multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase[0] + '|' + reg.multiBase[1] + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
@@ -74,7 +75,7 @@ const argon = {};
 
   const comp = { //components
     ref: function(ref, content) {
-      content = content || false;
+      content = content != null ? content : false;
       return ref.replace(rgx.ref, function(match, amplifier, value, value2, value3) {
         //value = normal # value; value2 = # round brackets; value3 = # square brackets
         let val = (value ? value : (value2 ? value2 : (value3 ? value3 : null)));
@@ -102,7 +103,7 @@ const argon = {};
       });
     },
     attributes: function(attribs, content) {
-      content = content || false;
+      content = content != null ? content : false;
       if (attribs) {
         return attribs.replace(rgx.attributes, function(match, ref, name, value, value2) {
           //value = round brackets; value2 = square brackets
@@ -117,7 +118,7 @@ const argon = {};
     },
     baseTag: function(str, expr, dry) {
       return str.replace(expr, function(match, combiTags, tag, attr, value, value2) {
-        const content = value || value2;
+        const content = value != null ? value : (typeof value2 == 'string' ? value2 : '');
         if (dry) {
           return content;
         } else {
