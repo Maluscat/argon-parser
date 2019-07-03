@@ -62,7 +62,7 @@ const argon = {};
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
-    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?!\\/\\/)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.altNot+'|['+reg.not+'])))',
+    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.altNot+'|['+reg.not+'])))',
     multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase[0] + '|' + reg.multiBase[1] + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
