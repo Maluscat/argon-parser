@@ -97,6 +97,7 @@ const argon = {};
         //value = normal # value; value2 = # round brackets; value3 = # square brackets
         let val = (value ? value : (value2 ? value2 : (value3 ? value3 : null)));
         if (val == null && content) {
+          content = content.replace(/\s/g, '-');
           if (amplifier == '!') {
             val = 'https://' + content;
           } else if (amplifier == '?') {
