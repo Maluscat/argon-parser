@@ -114,10 +114,9 @@ const argon = {};
             val = '#' + val;
           }
         } else {
-          console.error("Argon error: Couldn't parse a ‘href’ attribute with the special implicit ‘#’ case - no content available. Occured at '" + match + "'.");
           return '';
         }
-        return 'href="' + val + '"';
+        return ' href="' + val + '"';
       });
     },
     attributes: function(attribs, content) {
@@ -126,7 +125,7 @@ const argon = {};
         return attribs.replace(rgx.attributes, function(match, ref, name, value, value2) {
           //value = round brackets; value2 = square brackets
           if (ref) {
-            return ' ' + comp.ref(ref, content);
+            return comp.ref(ref, content);
           } else {
             const val = (value != null ? value : value2);
             return (val != null ? ' ' + name + '="' + val + '"' : ' ' + name);
