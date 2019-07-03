@@ -33,12 +33,28 @@ const argon = {};
         '\\}',
       ]
     },
+    bracket: {
+      start: [
+        '\\(',
+        '\\['
+      ],
+      end: [
+        '\\)',
+        '\\]'
+      ]
+    },
     empty: '\\.|',
     tag: '[\\w-]+',
     not: "\\s,?!:'()\\[\\]",
     delimiter: '\\|?'
   };
   reg.altNot = '\\.[' + reg.not + '.|' + ']';
+  reg.singlePlus = '';
+  (function() {
+    for (var i = 0; i < reg.bracket.start.length; i++) {
+      reg.singlePlus += '(' + reg.bracket.start[i] + '(?:(?!' + reg.altNot + ')[^' + reg.not + '])+?' + reg.bracket.end[i] + ')' + (i < reg.bracket.start.length - 1 ? '|' : '');
+    }
+  })();
   reg.singleNot = '';
   reg.multiBase = new Array(reg.multi.start.length);
   (function() { //Constructing the syntax variations at multiWord tags
@@ -62,7 +78,7 @@ const argon = {};
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
-    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.altNot+'|['+reg.not+'])))',
+    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.altNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
     multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase[0] + '|' + reg.multiBase[1] + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
@@ -118,8 +134,8 @@ const argon = {};
       } else return '';
     },
     baseTag: function(str, expr, dry) {
-      return str.replace(expr, function(match, combiTags, tag, attr, value, value2) {
-        const content = value != null ? value : (typeof value2 == 'string' ? value2 : '');
+      return str.replace(expr, function(match, combiTags, tag, attr, value, value2, value3) {
+        const content = value != null ? value : (value2 != null ? value2 : (typeof value3 == 'string' ? value3 : ''));
         if (dry) {
           return content;
         } else {
