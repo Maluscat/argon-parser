@@ -75,7 +75,7 @@ const argon = {};
 
   //Holding all parsing relevant expressions
   const rgx = {
-    placeholder: '\\$(?:{(\\w+)})?',
+    placeholder: '\\$(?:{((?:\\w+;?)+?)})?',
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
@@ -93,19 +93,27 @@ const argon = {};
   const comp = { //components
     placeholder: function(str, content) {
       if (content) {
-        return str.replace(rgx.placeholder, function(match, flags) {
+        return str.replace(rgx.placeholder, function(match, filters) {
           let val = content;
           let snake = true;
-          if (flags) {
-            flags = flags.split('');
-            for (let i = 0; i < flags.length; i++) {
-              if (flags[i] == 'r') {
+          if (filters) {
+            filters = filters.split(';');
+            if (filters.length == 1) filters = filters[0].split('');
+            if (!filters[filters.length - 1]) filters.pop();
+            filters.forEach(function(flag) {
+              if (flag == 'r' || flag == 'raw') {
                 snake = false;
-              } else if (filters.rare.indexOf(flags[i]) != -1) {
-                snake = false;
-                val = (filters[flags[i]])(val);
-              } else val = (filters[flags[i]])(val);
-            }
+                return;
+              }
+              const name = flags.names[flag];
+              if (!name) {
+                console.error("Argon error: flag ‘" + flag + "’ does not exist (case ‘" + content + "’ at ‘" + str + "’). Skipping the flag.");
+                return;
+              }
+              if (flags.raw.indexOf(name) != -1) snake = false;
+              const res = (flags.flags[name])(val);
+              val = res != null ? res : val;
+            });
           }
           return snake ? val.replace(/\s/g, '-') : val;
         });
@@ -197,32 +205,55 @@ const argon = {};
     }
   }
 
-  const filters = {
-    rare: [
-      's',
-      'c',
-      'p'
-    ],
-    s: function(val) {
-      return val.replace(/\s/g, '_');
-    },
-    c: function (val) {
-      val = val.toLowerCase();
-      return val.replace(/\s[\S\D]/g, function(match) {
-        return match.slice(1).toUpperCase();
+  const flags = {
+    names: {},
+    raw: [],
+    flags: {}
+  }
+
+  function flagDupeError(item) {
+    console.error('Argon error @ addFlag: Flag name ‘' + item + '’ already exists. Flag name dropped - continuing without it.\nAliases for the duplicate name: ' + (Object.keys(flags.names).reduce(function(prev, current) {
+      return prev += flags.names[current] == flags.names[item] ? (prev ? ', ' : '') + '‘' + current + '’' : '';
+    }, '') || '// none'));
+  }
+
+  argon.addFlag = function(name, funct, raw) {
+    if (typeof name != 'string' && !Array.isArray(name)) {
+      console.error('Argon error @ addFlag: The first parameter (name/names of the flag) (case ‘' + name + '’) is neither a String nor an Array. Aborting process.');
+      return;
+    }
+    if (typeof funct != 'function') {
+      console.error('Argon error @ addFlag: The second parameter (function of the flag) (case ‘' + funct + '’) is not a valid function. Aborting process.');
+      return;
+    }
+    if (raw !== true) raw = false; //default parameters don't work in IE (reee)
+    if (Array.isArray(name)) {
+      while (true) {
+        if (name[0] != null && flags.names[name[0]] != null) {
+          flagDupeError(name[0]);
+          name.shift();
+        } else if (name[0] == null) {
+          console.error('Argon error @ addFlag: Every possible flag name has been duplicate. Dropping the flag altogether.');
+          break;
+        } else {
+          flags.flags[name[0]] = funct;
+          if (raw) flags.raw.push(name[0]);
+          break;
+        }
+      }
+      name.forEach(function(alias) {
+        if (flags.names[alias] != null) {
+          flagDupeError(alias);
+        } else flags.names[alias] = name[0];
       });
-    },
-    p: function (val) {
-      val = val[0].toUpperCase() + val.slice(1).toLowerCase();
-      return val.replace(/\s[\S\D]/g, function(match) {
-        return match.slice(1).toUpperCase();
-      });
-    },
-    l: function (val) {
-      return val.toLowerCase();
-    },
-    u: function (val) {
-      return val.toUpperCase();
+    } else {
+      if (flags.names[name] != null) {
+        flagDupeError(name);
+      } else {
+        flags.flags[name] = funct;
+        flags.names[name] = name;
+        if (raw) flags.raw.push(name);
+      }
     }
   }
 
@@ -230,9 +261,31 @@ const argon = {};
   argon.comp = comp;
 })();
 
+argon.addFlag(['s', 'snake'], function(val) {
+  return val.replace(/\s/g, '_');
+}, true);
+argon.addFlag(['c', 'camel'], function (val) {
+  val = val.toLowerCase();
+  return val.replace(/\s[\S\D]/g, function(match) {
+    return match.slice(1).toUpperCase();
+  });
+}, true);
+argon.addFlag(['p', 'pascal'], function (val) {
+  val = val[0].toUpperCase() + val.slice(1).toLowerCase();
+  return val.replace(/\s[\S\D]/g, function(match) {
+    return match.slice(1).toUpperCase();
+  });
+}, true);
+argon.addFlag(['l', 'low'], function (val) {
+  return val.toLowerCase();
+});
+argon.addFlag(['u', 'up'], function (val) {
+  return val.toUpperCase();
+});
+
 //`exports` for npm, `argon` for the web
 (typeof exports != 'undefined' && exports != null ? exports : argon).parse = function(string, dry) {
-  dry = dry === true ? dry : false;
+  if (dry !== true) dry = false; //default parameters don't work in IE (reee)
   string = argon.comp.singleWord(string, dry);
   string = argon.comp.multiWord(string, dry);
   string = argon.comp.singleTag(string, dry);
