@@ -75,6 +75,7 @@ const argon = {};
 
   //Holding all parsing relevant expressions
   const rgx = {
+    placeholder: '\\$(?:{(\\w+)})?',
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
@@ -89,13 +90,32 @@ const argon = {};
     const rgxKeys = Object.keys(rgx);
     for (var i = 0; i < rgxKeys.length; i++) rgx[rgxKeys[i]] = new RegExp(rgx[rgxKeys[i]], 'g');
   })();
-
   const comp = { //components
+    placeholder: function(str, content) {
+      if (content) {
+        return str.replace(rgx.placeholder, function(match, flags) {
+          let val = content;
+          let snake = true;
+          if (flags) {
+            flags = flags.split('');
+            for (let i = 0; i < flags.length; i++) {
+              if (flags[i] == 'r') {
+                snake = false;
+              } else if (filters.rare.indexOf(flags[i]) != -1) {
+                snake = false;
+                val = (filters[flags[i]])(val);
+              } else val = (filters[flags[i]])(val);
+            }
+          }
+          return snake ? val.replace(/\s/g, '-') : val;
+        });
+      } else return str;
+    },
     ref: function(ref, content) {
       content = content != null ? content : false;
       return ref.replace(rgx.ref, function(match, amplifier, value, value2, value3) {
         //value = normal # value; value2 = # round brackets; value3 = # square brackets
-        let val = (value ? value : (value2 ? value2 : (value3 ? value3 : null)));
+        let val = value != null ? value : (value2 != null ? value2 : (value3 != null ? value3 : null));
         if (val == null && content) {
           content = content.replace(/\s/g, '-');
           if (amplifier == '!') {
@@ -106,6 +126,7 @@ const argon = {};
             val = '#' + content;
           }
         } else if (val != null) {
+          val = comp.placeholder(val, content);
           if (amplifier == '!') {
             val = 'https://' + val;
           } else if (amplifier == '?') {
@@ -127,7 +148,8 @@ const argon = {};
           if (ref) {
             return comp.ref(ref, content);
           } else {
-            const val = (value != null ? value : value2);
+            let val = (value != null ? value : value2);
+            val = comp.placeholder(val, content);
             return (val != null ? ' ' + name + '="' + val + '"' : ' ' + name);
           }
         });
@@ -172,6 +194,35 @@ const argon = {};
           return '<' + tag + attr + '>';
         }
       });
+    }
+  }
+
+  const filters = {
+    rare: [
+      's',
+      'c',
+      'p'
+    ],
+    s: function(val) {
+      return val.replace(/\s/g, '_');
+    },
+    c: function (val) {
+      val = val.toLowerCase();
+      return val.replace(/\s[\S\D]/g, function(match) {
+        return match.slice(1).toUpperCase();
+      });
+    },
+    p: function (val) {
+      val = val[0].toUpperCase() + val.slice(1).toLowerCase();
+      return val.replace(/\s[\S\D]/g, function(match) {
+        return match.slice(1).toUpperCase();
+      });
+    },
+    l: function (val) {
+      return val.toLowerCase();
+    },
+    u: function (val) {
+      return val.toUpperCase();
     }
   }
 
