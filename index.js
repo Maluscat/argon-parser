@@ -56,11 +56,11 @@ const argon = {};
     }
   })();
   reg.singleNot = '';
-  reg.multiBase = new Array(reg.multi.start.length);
+  reg.multiBase = '';
   (function() { //Constructing the syntax variations at multiWord tags
-    for (var i = 0; i < reg.multiBase.length; i++) {
+    for (var i = 0; i < reg.multi.start.length; i++) {
       reg.singleNot += reg.multi.end[i];
-      reg.multiBase[i] = reg.multi.start[i] + '\\/\\/((?:[\\d\\D](?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i];
+      reg.multiBase += reg.multi.start[i] + '\\/\\/((?:[\\d\\D](?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i] + (i < reg.multi.start.length - 1 ? '|' : '');
     }
     reg.singleNot = '(?![' + reg.singleNot + '])';
   })();
@@ -79,7 +79,7 @@ const argon = {};
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
     singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.altNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
-    multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase[0] + '|' + reg.multiBase[1] + ')',
+    multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
 
