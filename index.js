@@ -297,8 +297,8 @@ obj.addFlag(['u', 'up'], function (val) {
 //`exports` for npm, `argon` for the web
 obj.parse = function(string, dry) {
   if (dry !== true) dry = false; //default parameters don't work in IE (reee)
-  string = argon.comp.singleWord(string, dry);
-  string = argon.comp.multiWord(string, dry);
-  string = argon.comp.singleTag(string, dry);
+  string = obj.comp.singleWord(string, dry);
+  string = obj.comp.multiWord(string, dry);
+  string = obj.comp.singleTag(string, dry);
   return string;
 }
