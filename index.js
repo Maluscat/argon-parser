@@ -4,7 +4,7 @@ const argon = {};
   //Parts and dependencies for rgx
   const reg = {
     attr: {
-      name: '[\\w-]+',
+      name: '[\\w-${}]+',
       value: [
         '[^()]+',
         '[^\\[\\]]+'
@@ -168,6 +168,7 @@ const argon = {};
           } else {
             let val = (value != null ? value : value2);
             val = comp.placeholder(val, content);
+            name = comp.placeholder(name, content);
             return (val != null ? ' ' + name + '="' + val + '"' : ' ' + name);
           }
         });
