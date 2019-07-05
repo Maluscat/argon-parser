@@ -1,4 +1,5 @@
 const argon = {};
+const obj = (typeof exports != 'undefined' && exports != null ? exports : argon);
 
 (function() {
   //Parts and dependencies for rgx
@@ -227,7 +228,7 @@ const argon = {};
     }, '') || '// none'));
   }
 
-  argon.addFlag = function(name, funct, raw) {
+  obj.addFlag = function(name, funct, raw) {
     if (typeof name != 'string' && !Array.isArray(name)) {
       console.error('Argon error @ addFlag: The first parameter (name/names of the flag) (case ‘' + name + '’) is neither a String nor an Array. Aborting process.');
       return;
@@ -267,34 +268,34 @@ const argon = {};
     }
   }
 
-  argon.rgx = rgx;
-  argon.comp = comp;
+  obj.rgx = rgx;
+  obj.comp = comp;
 })();
 
-argon.addFlag(['s', 'snake'], function(val) {
+obj.addFlag(['s', 'snake'], function(val) {
   return val.replace(/\s/g, '_');
 }, true);
-argon.addFlag(['c', 'camel'], function (val) {
+obj.addFlag(['c', 'camel'], function (val) {
   val = val.toLowerCase();
   return val.replace(/\s[\S\D]/g, function(match) {
     return match.slice(1).toUpperCase();
   });
 }, true);
-argon.addFlag(['p', 'pascal'], function (val) {
+obj.addFlag(['p', 'pascal'], function (val) {
   val = val[0].toUpperCase() + val.slice(1).toLowerCase();
   return val.replace(/\s[\S\D]/g, function(match) {
     return match.slice(1).toUpperCase();
   });
 }, true);
-argon.addFlag(['l', 'low'], function (val) {
+obj.addFlag(['l', 'low'], function (val) {
   return val.toLowerCase();
 });
-argon.addFlag(['u', 'up'], function (val) {
+obj.addFlag(['u', 'up'], function (val) {
   return val.toUpperCase();
 });
 
 //`exports` for npm, `argon` for the web
-(typeof exports != 'undefined' && exports != null ? exports : argon).parse = function(string, dry) {
+obj.parse = function(string, dry) {
   if (dry !== true) dry = false; //default parameters don't work in IE (reee)
   string = argon.comp.singleWord(string, dry);
   string = argon.comp.multiWord(string, dry);
