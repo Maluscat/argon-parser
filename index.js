@@ -20,7 +20,7 @@ const argon = {};
     },
     href: {
       case: '#',
-      amplfr: '[?!]?',
+      amplfr: '[?!&]?',
       not: '(?![(\\[])[^\\s,?!:<{/]'
     },
     multi: {
@@ -133,27 +133,26 @@ const argon = {};
       content = content != null ? content : false;
       return ref.replace(rgx.ref, function(match, amplifier, value, value2, value3) {
         //value = normal # value; value2 = # round brackets; value3 = # square brackets
-        let val = value != null ? value : (value2 != null ? value2 : (value3 != null ? value3 : null));
+        let val = value || value2 || value3 || null;
         if (val == null && content) {
           content = content.replace(/\s/g, '-');
-          if (amplifier == '!') {
-            val = 'https://' + content;
-          } else if (amplifier == '?') {
-            val = 'http://' + content;
-          } else {
-            val = '#' + content;
-          }
+          var text = content;
         } else if (val != null) {
           val = comp.placeholder(val, content);
-          if (amplifier == '!') {
-            val = 'https://' + val;
-          } else if (amplifier == '?') {
-            val = 'http://' + val;
-          } else {
-            val = '#' + val;
-          }
-        } else {
-          return '';
+          var text = val;
+        } else return '';
+        switch (amplifier) {
+          case '!':
+            val = 'https://' + text;
+            break;
+          case '?':
+            val = 'http://' + text;
+            break;
+          case '&':
+            val = text;
+            break;
+          default:
+            val = '#' + text;
         }
         return ' href="' + val + '"';
       });
