@@ -167,7 +167,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
             return comp.ref(ref, content);
           } else {
             let val = (value != null ? value : value2);
-            val = comp.placeholder(val, content);
+            if (val) val = comp.placeholder(val, content);
             name = comp.placeholder(name, content);
             return (val != null ? ' ' + name + '="' + val + '"' : ' ' + name);
           }
