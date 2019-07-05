@@ -46,7 +46,8 @@ const argon = {};
     empty: '\\.|',
     tag: '[\\w-]+',
     not: "\\s,?!:'()\\[\\]",
-    delimiter: '\\|?'
+    delimiter: '\\|?',
+    flags: '(?:{((?:\\w+;?)+?)})'
   };
   reg.altNot = '\\.[' + reg.not + '.|' + ']';
   reg.singlePlus = '';
@@ -75,7 +76,7 @@ const argon = {};
 
   //Holding all parsing relevant expressions
   const rgx = {
-    placeholder: '\\$(?:{((?:\\w+;?)+?)})?',
+    placeholder: '\\$' + reg.flags + '?|{([\\d\\D]+)}' + reg.flags,
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
@@ -91,31 +92,40 @@ const argon = {};
     for (var i = 0; i < rgxKeys.length; i++) rgx[rgxKeys[i]] = new RegExp(rgx[rgxKeys[i]], 'g');
   })();
   const comp = { //components
+    flags: function(str, filters, content) {
+      let snake = true;
+      filters = filters.split(';');
+      if (filters.length == 1) filters = filters[0].split('');
+      if (!filters[filters.length - 1]) filters.pop();
+      filters.forEach(function(flag) {
+        if (flag == 'r' || flag == 'raw') {
+          snake = false;
+          return;
+        }
+        const name = flags.names[flag];
+        if (!name) {
+          console.error("Argon error: flag ‘" + flag + "’ does not exist (case ‘" + content + "’ at ‘" + str + "’). Skipping the flag.");
+          return;
+        }
+        if (flags.raw.indexOf(name) != -1) snake = false;
+        const res = (flags.flags[name])(str);
+        str = res != null ? res : str;
+      });
+      return snake ? str.replace(/\s/g, '-') : str;
+    },
     placeholder: function(str, content) {
       if (content) {
-        return str.replace(rgx.placeholder, function(match, filters) {
-          let val = content;
-          let snake = true;
-          if (filters) {
-            filters = filters.split(';');
-            if (filters.length == 1) filters = filters[0].split('');
-            if (!filters[filters.length - 1]) filters.pop();
-            filters.forEach(function(flag) {
-              if (flag == 'r' || flag == 'raw') {
-                snake = false;
-                return;
-              }
-              const name = flags.names[flag];
-              if (!name) {
-                console.error("Argon error: flag ‘" + flag + "’ does not exist (case ‘" + content + "’ at ‘" + str + "’). Skipping the flag.");
-                return;
-              }
-              if (flags.raw.indexOf(name) != -1) snake = false;
-              const res = (flags.flags[name])(val);
-              val = res != null ? res : val;
-            });
+        return str.replace(rgx.placeholder, function(match, filters, value2, filters2) {
+          let val;
+          if (value2) {
+            val = comp.placeholder(value2, content);
+            if (filters2) val = comp.flags(val, filters2, content);
+          } else {
+            val = content;
+            if (filters) val = comp.flags(val, filters, content);
           }
-          return snake ? val.replace(/\s/g, '-') : val;
+          if (filters || filters2) val = val.replace(/\s/g, '-');
+          return val;
         });
       } else return str;
     },
