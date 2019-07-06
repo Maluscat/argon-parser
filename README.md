@@ -34,9 +34,9 @@ This allows you to always have the latest version when it gets pushed to GitHub.
 The other way is, well, download the script from its repo and include it with a script in your HTML file.. That was easy.
 
 ---
-After having imported the script, you can just go ahead and parse your favorite Argon syntax ([documented below](#syntax-documentation)) by calling the `parse` function - in the `argon` object in the browser or in the assigned variable after requiring on Node.js (See the [code documentation](#code-documentation)). For example: `argon.parse("This is s//probably em<//most likely//> useful")` (outputs `This is <s>probably</s> <em>most likely</em> useful`).<br>
+After having imported the script, you can just go ahead and parse your favorite Argon syntax ([documented below](#syntax-documentation)) by calling the `parse` function - in the `argon` object in the browser or in the assigned variable after requiring on Node.js (See the [code documentation](#code-documentation)).<br>For example: `argon.parse("This is s//probably em<//most likely//> useful")` (outputs `This is <s>probably</s> <em>most likely</em> useful`).<br>
 Note that Argon is only made for HTML _snippets_, for example for small segments of formatted text in a database (like the example in the introduction)!<br>
-Also note that Argon does not compile into actual elemented HTML, it just converts a string into a different string - Use innerHTML or insertAdjacentHTML for that.
+Also note that Argon does not compile into actual elemented HTML, it just converts a string into a different string - Use [innerHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML) or [insertAdjacentHTML](https://developer.mozilla.org/en-US/docs/Web/API/Element/insertAdjacentHTML) for that.
 
 ---
 ## Version notice
@@ -54,7 +54,7 @@ The `parse` function inside Argon's object is the main access point of Argon
 - It converts a passed string of [Argon syntax](#syntax-documentation) into a HTML string
 - It only converts a string into another string, not into actual JavaScript HTML elements
 #### The dry mode
-As of version 1.2.0, a second parameter can be defined in `parse`, which is the **dry mode**:
+As of **version 1.2.0**, a second parameter can be defined in `parse`, which is the **dry mode**:
 - It is a boolean; `true` turns dry mode on, `false` is the default
 - This mode strips the input string from all Argon syntax and does not parse it
 - This is for example very useful when having an argonized heading which should be defined as a hash id as well
@@ -63,11 +63,11 @@ argon.parse("code//Argon is em//pretty nice", true);
 ```
 -> `Argon is pretty nice`
 ### Adding custom flags: `addFlag(name, callback(value)[, raw])`
-From version 1.3.0, there's a special system to modify values with short-hand functions, called _flags_, directly inside the to-be-parsed string (See below for more info).
+From **version 1.3.0**, there's a special system to modify values with short-hand functions, called _flags_, directly inside the to-be-parsed string (See below for more info).<br>
 The function `addFlag` of the argon object may be used to add custom flags to argon:
-- `name` (String || Array<String>) defines the name or names of the function. It is either a single string or an array of strings to define multiple names which all refer to the same function
-- `callback` (Function) is the function executed on a value. It is defined as a function reference (anonymous function or named function without parentheses). The only parameter is the string value the flag is called on and the function ideally returns a modified value (But it can be omitted, then the value won't change)
-- `raw` (Boolean) defines whether the flag should negate the Automatic kebab-case which is applied to the value during the flag handling process
+- `name` (_String || Array<String>_) defines the name or names of the function. It is either a single string or an array of strings to define multiple names which all refer to the same function
+- `callback` (_Function_) is the function associated with the flag name/names. It is defined as a function reference (anonymous function or named function without parentheses). The only parameter is the string value the flag is called on. The function ideally returns a modified value (But it can be omitted, then the value won't change)
+- `raw` (_Boolean_) defines whether the flag should negate the automatic kebab-case which is applied to the value during the flag handling process
 ### Internal properties
 Two additional properties are stored in the main object which have no relevancy to the user, but are very helpful for developing and maybe other devs want to look into Argon a bit deeper
 - `rgx`: An object containing every final [Regular Expression](https://www.regular-expressions.info/) used for parsing
@@ -81,7 +81,7 @@ div<//inner html content//>
 ```
 -> output: `<div>inner html content</div>`
 
-Since version 1.2.1, an alternative syntax is available, using the characters `{}`:
+Since **version 1.2.1**, an alternative syntax is available, using the characters `{}`:
 ```
 div{//inner html content//}
 ```
@@ -92,21 +92,23 @@ div{//inner html content//}
 This is strong//Argon parser
 ```
 -> output: `This is <strong>Argon</strong> parser`
-- The single word content is stopped by whitespace or any of `. , ? !` (Up to version 1.3.0)
-- As of 1.3.0, some changes have been made in that regard:
+- The single word content is stopped by whitespace or any of `. , ? !` (**Up to version 1.3.0**)
+- As of **1.3.0**, some changes have been made in that regard:
   - The content is now stopped by whitespace or any of `, ? ! : ' ( ) [ ]`
   - A dot character (`.`) does now only stop the content when it is followed by any of the above or another dot - and then it is not included in the tag content; This allows the syntax to safely enclose URLs or dot-notated code snippets
   - In addition to the bracket word stops: When there is an opening bracket as the first character, a matching closing bracket will not stop the content:
-```
-HTTP (a em//protocol)
-```
--> `HTTP (a <em>protocol</em>)`
-However:
-```
-HTTP em//(protocol)
-```
--> `HTTP <em>(protocol)</em>`
-Obviously, this applies to square brackets as well
+      ```
+      HTTP (a em//protocol)
+      ```
+      -> `HTTP (a <em>protocol</em>)`
+
+      However:
+      ```
+      HTTP em//(protocol)
+      ```
+      -> `HTTP <em>(protocol)</em>`
+
+      Obviously, this applies to square brackets as well
 ### Non-closing tags
 ```
 Let's get to a/br!//new line!
@@ -126,16 +128,17 @@ Empty tags can be achieved in two ways. For one, enclosing tags can simply be om
 I need an empty span<////> for styling!
 ```
 -> `I need an empty <span></span> for styling!`
+
 However, there's a more convenient way too: Putting a dot directly behind single enclosing tags works too!
 ```
 I need an empty span//. for styling!
 ```
 -> `I need an empty <span></span> for styling!`
-- This latter syntax only works for version 1.3.0 and above
+- This latter syntax only works for **version 1.3.0** and above
 ### Combining tags
 Using a plus (`+`) sign, tags can be subsequently nested
-- This, beside being simply more convenient, allows for accessing the inner content when using implicit anchorization (with the special hash attribute case)
-- Prior to 1.1.0, only one word enclosing tags could have additional tags attached to them
+- This, beside being simply more convenient, allows for accessing the inner content when using [placeholders](#Placeholders) or implicit [anchorization](Special-attribute-case-href) (with the special hash attribute case)
+- **Prior to 1.1.0**, only one word enclosing tags could have additional tags attached to them
 ```
 this is em+strong//important!
 ```
@@ -143,12 +146,12 @@ this is em+strong//important!
 
 A more advanced example with attributes and anchorization (see below):
 ```
-Check out a#!:class(anchor)+strong:class(bold)<//github.com/hallo89/argon-parser//>.
+Check out a#!:class(anchor)+strong:class(bold)//github.com/hallo89/argon-parser.
 ```
 -> `Check out <a href="https://github.com/Hallo89/argon-parser" class="anchor"><strong class="bold">github.com/Hallo89/argon-parser</strong></a>.`
 ### Attributes
 The beginning of an attribute is marked by a colon (`:`), followed by an attribute name, which is directly followed by a set of round or square brackets containing the attribute value
-- An attribute name must only consist of letters or hyphens
+- An attribute name may only consist of letters, hyphens and placeholder and flag syntax
 - When needing a round bracket as part of a value, square brackets must be used and vice versa
 - The brackets along with their value may be omitted
 ```
@@ -160,30 +163,41 @@ As of **version 1.3.0**, placeholders can be embedded into attribute names and a
 - A placeholder is defined as the dollar sign character (`$`)
 - It carries the tag content to be expanded at its place
 - It can be combined with [flags](#Modifying-values-with-flags)
+
 Example:
 ```
 We have a property code#$-property:class($)//value
 ```
--> `We have a property <code href="value-property" class="value">value</code>`
+-> `We have a property <code href="#value-property" class="value">value</code>`
+
+By default, whitespaces inside placeholder values are always replaced with hyphens (kebab-case without lowercasing):
+```
+Kebab case is div:class($)<//a very nice//> case
+```
+-> `Kebab case is <div class="a-very-nice">a very nice</div> case`
+
+See the [raw flags section](#Raw-flags) below for ways to prevent this
 
 An example with flags (see below for more info):
 ```
 Let's have a code:data-value(${ls}):onclick[${c}()]<//value OBJECT//>
 ```
--> `Let's have a <code data-value="value_object" onclick="valueObject()">value OBJECT</code>`
+-> `Let's have a <code data-value="value_object" onclick="valueObject()">value OBJECT</code>`<br>
 (Where `l` = lowercase, `s` = snake case, `c` = camel case; See the flag reference)
 ### Modifying values with _flags_
 **Version 1.3.0** introduced a _flag system_, which allows content to be dynamically run through functions during the parsing process
 - These functions are called _flags_, because they are based on being single letters, like RegEx flags. However, they can sure enough be complete words or abbreviations as well
 - Because they are loosely connected with placeholders, flags can be used on the same places as placeholders: attribute names and attribute values (also the special href case)
-- Flags are appended to content to process it with the specified flags
+- Flags are appended to content which is then processed with the specified flags
 - The syntax looks like this: `{content to be modified}{flags}` or when used with a [placeholder](#Placeholders), the curly brackets around the content can be omitted: `${flags}`
+
 By default, flags are treated as single characters:
 ```
 Let's modify a strong:class({Yes very nice}{lp})//nice value
 ```
--> `Let's modify a <strong class="YesVeryNice">nice</strong> value`
-Where `l` = lowercase and `p` = pascal case
+-> `Let's modify a <strong class="YesVeryNice">nice</strong> value`<br>
+(Where `l` = lowercase and `p` = pascal case)
+
 - Flags are processed from left to right, so in the above example, the content is lowercased at first and then pascal-cased
 
 Using semicolons, flags will be treated as words:
@@ -191,6 +205,7 @@ Using semicolons, flags will be treated as words:
 Let's modify a strong:class({Yes very nice}{low;pascal})//nice value
 ```
 -> Same result as above
+
 The last semicolon may be omitted but when using a single, worded flag, it needs to be added for the parser to understand that it needs to treat it as a word:
 ```
 Let's lowercase a strong:class({Yes very NICE}{low;})//nice value
@@ -202,11 +217,20 @@ Finally, flags can also be infinitely nested, for example like so:
 A very em:data-$({$-{nice content}{s}}{u})//advanced example
 ```
 -> `A very <em data-advanced="ADVANCED-NICE_CONTENT">advanced</em> example`
-The parser processes them from inside-out, so in this case `{nice content}{s}` is processed first, then `{$-nice_content}{u}` after that<br>
+
+- The parser processes them from inside-out, so in this case `{nice content}{s}` is processed first, then `{$-nice_content}{u}` after that
+
 As you surely have noticed, I can't really assemble a meaningful example with the few flags I have added as default - You come up with your own ideas!
 
 - A function for adding your own flags is available, the `addFlag` function
 - As I said, there are already some pre-defined flags which are listed below in the flag reference
+#### _Raw_ flags
+Placeholders are always kebab-cased by default. This can be prevented via two ways:
+##### For one, using the `r` (or aliased `raw` flag)
+This flag is special - it is no actual defined flag but an exception in the code. Specifying this flag disables the post-processing of the content to kebab case
+- See the flag documentation for more information
+##### The second way: _raw flags_
+As stated at the `addFlag` code documentation, flags can be marked as _raw_, which disables the kebab-casing for the to-be-flagged content once any raw flag is specified
 ### Special attribute case: href
 Using a hash character (`#`) immediately after the tag name (before potential attributes) unlocks a more convenient way of defining a `href` attribute with special values.
 - A value may be written after the hash, but can be omitted - entering a value makes the `href` correspond to that value, omitting it will take the tag content instead.
@@ -258,17 +282,18 @@ a#?//hallo89.net, that's my unsecure website
 
 ---
 - An explicit value may not contain any of following characters: whitespace or any of `,?!:<{/` (The slash doesn't make much sense here, I will see about removing it from the exceptions)
-- For using _any_ character in the value, a round or square bracket may be used. This is like with attributes, the bracket type itself may not be part of the value: when needing a round bracket in a value, use square brackets and vice versa<br>
+- For using _any_ character in the value, a round or square bracket may be used. Like with attributes, the bracket type itself may not be part of the value: when needing a round bracket in a value, use square brackets and vice versa<br>
 ```
 a#(weird::id/syntax!)//property
 ```
 -> `<a href="#weird::id/syntax!">property</a>`
 
 - From **version 1.3.0** and up, whitespace within content is automatically replaced with dashes (kebab-case without lowercasing):
-```
-See also a#<//HTML attributes//>
-```
--> `See also <a href="HTML-attributes">HTML attributes</a>`
+  ```
+  See also a#<//HTML attributes//>
+  ```
+  -> `See also <a href="HTML-attributes">HTML attributes</a>`
+
 ---
 ## Licensing
 This project is licensed under the [MIT license](https://github.com/Hallo89/argon-parser/blob/master/LICENSE)
