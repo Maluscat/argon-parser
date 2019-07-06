@@ -273,6 +273,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
 })();
 
 obj.addFlag(['s', 'snake'], function(val) {
+  val = val.toLowerCase();
   return val.replace(/\s/g, '_');
 }, true);
 obj.addFlag(['c', 'camel'], function (val) {
