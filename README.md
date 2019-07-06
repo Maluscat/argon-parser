@@ -5,6 +5,7 @@
 - [Getting started](#getting-started)
 - [Code documentation](#code-documentation)
 - [Syntax documentation](#syntax-documentation)
+- [Flag documentation](#flag-documentation)
 - [Licensing](#licensing)
 ---
 ## Introduction
@@ -57,9 +58,9 @@ argon.parse("code//Argon is em//pretty nice", true);
 ```
 -> `Argon is pretty nice`
 ### Adding custom flags: `addFlag(name, callback(value)[, raw])`
-From **version 1.3.0**, there's a special system to modify values with short-hand functions, called _flags_, directly inside the to-be-parsed string (See below for more info).<br>
+From **version 1.3.0**, there's a special system to modify values with short-hand functions, called _flags_, directly inside the to-be-parsed string ([See below](#modifying-values-with-flags) for more info).<br>
 The function `addFlag` of the argon object may be used to add custom flags to argon:
-- `name` (_String || Array<String>_) defines the name or names of the function. It is either a single string or an array of strings to define multiple names which all refer to the same function
+- `name` (_String || Array\<String\>_) defines the name or names of the function. It is either a single string or an array of strings to define multiple names which all refer to the same function
 - `callback` (_Function_) is the function associated with the flag name/names. It is defined as a function reference (anonymous function or named function without parentheses). The only parameter is the string value the flag is called on. The function ideally returns a modified value (But it can be omitted, then the value won't change)
 - `raw` (_Boolean_) defines whether the flag should negate the automatic kebab-case which is applied to the value during the flag handling process
 ### Internal properties
@@ -131,7 +132,7 @@ I need an empty span//. for styling!
 - This latter syntax only works for **version 1.3.0** and above
 ### Combining tags
 Using a plus (`+`) sign, tags can be subsequently nested
-- This, beside being simply more convenient, allows for accessing the inner content when using [placeholders](#Placeholders) or implicit [anchorization](Special-attribute-case-href) (with the special hash attribute case)
+- This, beside being simply more convenient, allows for accessing the inner content when using [placeholders](#placeholders) or implicit [anchorization](special-attribute-case-href) (with the special hash attribute case)
 - **Prior to 1.1.0**, only one word enclosing tags could have additional tags attached to them
 ```
 this is em+strong//important!
@@ -153,10 +154,10 @@ strong:class(bold ag):id(char-3):onclick[log('content')]:contenteditable//Argon
 ```
 -> `<strong class="bold ag" id="char-3" onclick="log('content')" contenteditable>Argon</strong>`
 ### Placeholders
-As of **version 1.3.0**, placeholders can be embedded into attribute names and attribute values (Also the [special href case](#Special-attribute-case-href) values):
+As of **version 1.3.0**, placeholders can be embedded into attribute names and attribute values (Also the [special href case](#special-attribute-case-href) values):
 - A placeholder is defined as the dollar sign character (`$`)
 - It carries the tag content to be expanded at its place
-- It can be combined with [flags](#Modifying-values-with-flags)
+- It can be combined with [flags](#modifying-values-with-flags)
 
 Example:
 ```
@@ -169,21 +170,20 @@ By default, whitespaces inside placeholder values are always replaced with hyphe
 Kebab case is div:class($)<//a very nice//> case
 ```
 -> `Kebab case is <div class="a-very-nice">a very nice</div> case`
-
-See the [raw flags section](#Raw-flags) below for ways to prevent this
+- See the [raw flags section](#raw-flags) below for ways to prevent this
 
 An example with flags (see below for more info):
 ```
 Let's have a code:data-value(${ls}):onclick[${c}()]<//value OBJECT//>
 ```
 -> `Let's have a <code data-value="value_object" onclick="valueObject()">value OBJECT</code>`<br>
-(Where `l` = lowercase, `s` = snake case, `c` = camel case; See the flag reference)
+(Where `l` = lowercase, `s` = snake case, `c` = camel case; See the [flag reference](#flag-documentation))
 ### Modifying values with _flags_
 **Version 1.3.0** introduced a _flag system_, which allows content to be dynamically run through functions during the parsing process
 - These functions are called _flags_, because they are based on being single letters, like RegEx flags. However, they can sure enough be complete words or abbreviations as well
 - Because they are loosely connected with placeholders, flags can be used on the same places as placeholders: attribute names and attribute values (also the special href case)
-- Flags are appended to content which is then processed with the specified flags
-- The syntax looks like this: `{content to be modified}{flags}` or when used with a [placeholder](#Placeholders), the curly brackets around the content can be omitted: `${flags}`
+- Flags are appended to content which is then run through the specified flags
+- The syntax looks like this: `{content to be modified}{flags}` or when used with a [placeholder](#placeholders), the curly brackets around the content can be omitted: `${flags}`
 
 By default, flags are treated as single characters:
 ```
@@ -216,16 +216,18 @@ A very em:data-$({$-{nice content}{s}}{u})//advanced example
 
 As you surely have noticed, I can't really assemble a meaningful example with the few flags I have added as default - You come up with your own ideas!
 
-- A function for adding your own flags is available, the `addFlag` function
-- As I said, there are already some pre-defined flags which are listed below in the flag reference
+- A function for adding your own flags is available, [the `addFlag` function](#adding-custom-flags-addflagname-callbackvalue-raw)
+- As I said, there are already some pre-defined flags which are listed below in the [flag documentation](#flag-documentation)
 #### _Raw_ flags
-Placeholders are always kebab-cased by default. This can be prevented via two ways:
+Placeholders are always kebab-cased by default.
+- The kebab-casing is always the last operation applied
+- The automatic casing can be prevented via two ways:
 ##### For one, using the `r` (or aliased `raw` flag)
 This flag is special - it is no actual defined flag but an exception in the code. Specifying this flag disables the post-processing of the content to kebab case
 - See the flag documentation for more information
 ##### The second way: _raw flags_
-As stated at the `addFlag` code documentation, flags can be marked as _raw_, which disables the kebab-casing for the to-be-flagged content once any raw flag is specified
-- Flags are most-likely marked as raw when they need to do something with the whitespace which is prevented by the kebab-casing
+As stated at the [`addFlag` code documentation](#adding-custom-flags-addflagname-callbackvalue-raw), flags can be marked as _raw_, which disables the kebab-casing for the to-be-flagged content once any raw flag is specified
+- Flags are most-likely marked as raw when they need to do something with the whitespace which is otherwise taken by the kebab-casing
 ### Special attribute case: href
 Using a hash character (`#`) immediately after the tag name (before potential attributes) unlocks a more convenient way of defining a `href` attribute with special values.
 - A value may be written after the hash, but can be omitted - entering a value makes the `href` correspond to that value, omitting it will take the tag content instead.
@@ -291,8 +293,8 @@ a#(weird::id/syntax!)//property
 
 ---
 ## Flag documentation
-Listed here are Argon default [flags](#Modifying-values-with-flags). Obviously, only valid from **version 1.3.0** and up.<br>
-For the system of _raw flags_, see [raw flags](#Raw-flags) in the flags section;
+Listed here are Argon default [flags](#modifying-values-with-flags). Obviously, only valid from **version 1.3.0** and up.<br>
+For the system of _raw flags_, see [raw flags](#raw-flags) in the flags section;
 
 ### `r`, `raw`
 A pseudo-flag.
