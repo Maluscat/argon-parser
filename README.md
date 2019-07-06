@@ -132,7 +132,7 @@ I need an empty span//. for styling!
 - This latter syntax only works for **version 1.3.0** and above
 ### Combining tags
 Using a plus (`+`) sign, tags can be subsequently nested
-- This, beside being simply more convenient, allows for accessing the inner content when using [placeholders](#placeholders) or implicit [anchorization](special-attribute-case-href) (with the special hash attribute case)
+- This, beside being simply more convenient, allows for accessing the inner content when using [placeholders](#placeholders) or implicit [anchorization](#special-attribute-case-href) (with the special hash attribute case)
 - **Prior to 1.1.0**, only one word enclosing tags could have additional tags attached to them
 ```
 this is em+strong//important!
