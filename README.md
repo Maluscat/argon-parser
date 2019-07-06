@@ -225,6 +225,7 @@ This flag is special - it is no actual defined flag but an exception in the code
 - See the flag documentation for more information
 ##### The second way: _raw flags_
 As stated at the `addFlag` code documentation, flags can be marked as _raw_, which disables the kebab-casing for the to-be-flagged content once any raw flag is specified
+- Flags are most-likely marked as raw when they need to do something with the whitespace which is prevented by the kebab-casing
 ### Special attribute case: href
 Using a hash character (`#`) immediately after the tag name (before potential attributes) unlocks a more convenient way of defining a `href` attribute with special values.
 - A value may be written after the hash, but can be omitted - entering a value makes the `href` correspond to that value, omitting it will take the tag content instead.
@@ -287,6 +288,31 @@ a#(weird::id/syntax!)//property
   See also a#<//HTML attributes//>
   ```
   -> `See also <a href="HTML-attributes">HTML attributes</a>`
+
+---
+## Flag documentation
+Listed here are Argon default [flags](#Modifying-values-with-flags). Obviously, only valid from **version 1.3.0** and up.<br>
+For the system of _raw flags_, see [raw flags](#Raw-flags) in the flags section;
+
+### `r`, `raw`
+A pseudo-flag.
+- It prevents placeholder content from being kebab-cased
+- It has the same effect as a _raw_ flag and may be used when no other raw flag is in use
+### `s`, `snake`
+This flag snake-cases the content; first, it lowercases everything and then it replaces whitespace with underscores.
+- raw: true
+### `c`, `camel`
+Camel-case. Everything is lowercased except characters immediately following a whitespace, which are uppercased
+- raw: true
+### `p`, `pascal`
+Pascal-case. Like camel-case but the first character is uppercased
+- raw: true
+### `l`, `low`
+Lowercase. Lowercase the whole content
+- raw: false
+### `u`, `up`
+Uppercase. Uppercase the whole content
+- raw: false
 
 ---
 ## Licensing
