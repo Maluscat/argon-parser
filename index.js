@@ -216,9 +216,14 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
   }
 
   const flags = {
-    names: {},
+    names: {
+      'raw': 'r';
+      'r': 'r'
+    },
     raw: [],
-    flags: {}
+    flags: {
+      'r': true,
+    }
   }
 
   function flagDupeError(item) {
