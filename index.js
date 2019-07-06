@@ -123,9 +123,8 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
             if (filters2) val = comp.flags(val, filters2, content);
           } else {
             val = content;
-            if (filters) val = comp.flags(val, filters, content);
+            val = filters ? comp.flags(val, filters, content) : val = val.replace(/\s/g, '-');
           }
-          if (filters || filters2) val = val.replace(/\s/g, '-');
           return val;
         });
       } else return str;
