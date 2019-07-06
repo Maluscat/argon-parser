@@ -94,13 +94,13 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
   })();
   const comp = { //components
     flags: function(str, filters, content) {
-      let snake = true;
+      let kebab = true;
       filters = filters.split(';');
       if (filters.length == 1) filters = filters[0].split('');
       if (!filters[filters.length - 1]) filters.pop();
       filters.forEach(function(flag) {
         if (flag == 'r' || flag == 'raw') {
-          snake = false;
+          kebab = false;
           return;
         }
         const name = flags.names[flag];
@@ -108,11 +108,11 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
           console.error("Argon error: flag ‘" + flag + "’ does not exist (case ‘" + content + "’ at ‘" + str + "’). Skipping the flag.");
           return;
         }
-        if (flags.raw.indexOf(name) != -1) snake = false;
+        if (flags.raw.indexOf(name) != -1) kebab = false;
         const res = (flags.flags[name])(str);
         str = res != null ? res : str;
       });
-      return snake ? str.replace(/\s/g, '-') : str;
+      return kebab ? str.replace(/\s/g, '-') : str;
     },
     placeholder: function(str, content) {
       if (content) {
