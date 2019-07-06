@@ -217,12 +217,12 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
 
   const flags = {
     names: {
-      'raw': 'r';
+      'raw': 'r',
       'r': 'r'
     },
     raw: [],
     flags: {
-      'r': true,
+      'r': true
     }
   }
 
