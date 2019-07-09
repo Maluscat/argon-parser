@@ -105,7 +105,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
         }
         const name = flags.names[flag];
         if (!name) {
-          console.error("Argon error: flag ‘" + flag + "’ does not exist (case ‘" + content + "’ at ‘" + str + "’). Skipping the flag.");
+          console.error("Argon error: flag ‘" + flag + "’ does not exist (case ‘" + content + "’ at flagged string ‘" + str + "’). Skipping the flag.");
           return;
         }
         if (flags.raw.indexOf(name) != -1) kebab = false;
