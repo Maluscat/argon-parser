@@ -22,7 +22,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     href: {
       case: '#',
       amplfr: '[?!&]?',
-      not: '(?![(\\[])[^\\s,?!:</]'
+      not: '(?![(\\[])[^\\s,?!:<{/]'
     },
     multi: {
       start: [
