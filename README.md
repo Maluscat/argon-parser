@@ -89,7 +89,7 @@ This is strong//Argon parser
 -> output: `This is <strong>Argon</strong> parser`
 - The single word content is stopped by whitespace or any of `. , ? !` (**Up to version 1.3.0**)
 - As of **1.3.0**, some changes have been made in that regard:
-  - The content is now stopped by whitespace or any of `, ? ! : ' ( ) [ ]`
+  - The content is now stopped by whitespace or any of `, ? ! : ' ( ) [ ] //> //}` (The last two have been added in **1.3.4**, to avoid conflicts with multi word tags)
   - A dot character (`.`) does now only stop the content when it is followed by any of the above or another dot - and then it is not included in the tag content; This allows the syntax to safely enclose URLs or dot-notated code snippets
   - In addition to the bracket word stops: When there is an opening bracket as the first character, a matching closing bracket will not stop the content:
       ```
