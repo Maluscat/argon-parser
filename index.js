@@ -50,6 +50,12 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     delimiter: '\\|?',
     flags: '(?:{((?:\\w+;?)+?)})'
   };
+  reg.multiStops = '\\/\\/';
+  (function() {
+    reg.multiStops += '[';
+    for (var i = 0; i < reg.multi.end.length; i++) reg.multiStops += reg.multi.end[i];
+    reg.multiStops += ']';
+  })();
   reg.altNot = '\\.[' + reg.not + '.|' + ']';
   reg.singlePlus = '';
   (function() {
@@ -81,7 +87,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
-    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.altNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
+    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.multiStops+'|'+reg.altNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
     multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
