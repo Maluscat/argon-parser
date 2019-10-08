@@ -150,6 +150,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
           val = comp.placeholder(val, content);
           var text = val;
         } else return '';
+        text = text.replace(/"/g, '\\"');
         switch (amplifier) {
           case '!':
             val = 'https://' + text;
@@ -175,7 +176,10 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
             return comp.ref(ref, content);
           } else {
             let val = (value != null ? value : value2);
-            if (val) val = comp.placeholder(val, content);
+            if (val) {
+              val = comp.placeholder(val, content);
+              val = val.replace(/"/g, '\\"');
+            }
             name = comp.placeholder(name, content);
             return (val != null ? ' ' + name + '="' + val + '"' : ' ' + name);
           }
