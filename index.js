@@ -45,11 +45,13 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       ]
     },
     empty: '\\.|',
-    tag: '[\\w-]+',
+    tag: '[\\w-]',
     not: "\\s,?!:'()\\[\\]",
-    delimiter: '\\|?',
+    delimiter: '\\|',
     flags: '(?:{((?:\\w+;?)+?)})'
   };
+  reg.delimitStart = '(' + reg.tag + reg.delimiter + ')?';
+  reg.tag += '+'; //Reusing the variable
   reg.multiStops = '\\/\\/';
   (function() {
     reg.multiStops += '[';
@@ -87,8 +89,8 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
-    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.multiStops+'|'+reg.dotNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
-    multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase + ')',
+    singleWord: reg.delimitStart + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:'+reg.delimiter+'(?=[^'+reg.not+'])|(?=$|'+reg.multiStops+'|'+reg.dotNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
+    multiWord: reg.delimitStart + reg.combiTag + '(?:' + reg.multiBase + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
 
@@ -181,10 +183,12 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       } else return '';
     },
     baseTag: function(str, expr, dry) {
-      return str.replace(expr, function(match, combiTags, tag, attr, value, value2, value3) {
+      return str.replace(expr, function(match, delimited, combiTags, tag, attr, value, value2, value3) {
         const content = value != null ? value : (value2 != null ? value2 : (typeof value3 == 'string' ? value3 : ''));
+        //This is a workaround to the badly supported RegExp lookbehinds, an ES2018 feature
+        const leading = delimited ? delimited.slice(0, 1) : '';
         if (dry) {
-          return content;
+          return leading + content;
         } else {
           attr = comp.attributes(attr, content);
           let startTag = '<' + tag + attr + '>';
@@ -196,7 +200,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
               return '<' + extraTag + attribs + '>';
             }) + startTag;
           }
-          return startTag + content + endTag;
+          return leading + startTag + content + endTag;
         }
       });
     },
