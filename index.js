@@ -56,11 +56,11 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     for (var i = 0; i < reg.multi.end.length; i++) reg.multiStops += reg.multi.end[i];
     reg.multiStops += ']';
   })();
-  reg.altNot = '\\.[' + reg.not + '.|' + ']';
+  reg.dotNot = '\\.(?:$|[' + reg.not + '.|' + '])';
   reg.singlePlus = '';
   (function() {
     for (var i = 0; i < reg.bracket.start.length; i++) {
-      reg.singlePlus += '(' + reg.bracket.start[i] + '(?:(?!' + reg.altNot + ')[^' + reg.not + '])+?' + reg.bracket.end[i] + ')' + (i < reg.bracket.start.length - 1 ? '|' : '');
+      reg.singlePlus += '(' + reg.bracket.start[i] + '(?:(?!' + reg.dotNot + ')[^' + reg.not + '])+?' + reg.bracket.end[i] + ')' + (i < reg.bracket.start.length - 1 ? '|' : '');
     }
   })();
   reg.singleNot = '';
@@ -87,7 +87,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
-    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.multiStops+'|'+reg.altNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
+    singleWord: reg.delimiter + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:\\|(?=[^'+reg.not+'])|(?=$|'+reg.multiStops+'|'+reg.dotNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
     multiWord: reg.delimiter + reg.combiTag + '(?:' + reg.multiBase + ')',
     singleTag: '\\/(?!-)' + reg.base + '!\\/\\/'
   };
@@ -98,6 +98,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     const rgxKeys = Object.keys(rgx);
     for (var i = 0; i < rgxKeys.length; i++) rgx[rgxKeys[i]] = new RegExp(rgx[rgxKeys[i]], 'g');
   })();
+
   const comp = { //components
     flags: function(str, filters, content) {
       let kebab = true;
