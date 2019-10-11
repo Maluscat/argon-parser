@@ -98,7 +98,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
   const rgx = {
     placeholder: '\\$' + reg.flags + '?|{([\\d\\D]+)}' + reg.flags,
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.attrGroup.g + '?)(?=:|$)',
-    ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.attrGroup.g + ')',
+    ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.attrGroup.g + ')$',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
     singleWord: reg.delimitStart + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:'+reg.delimiter+'(?=[^'+reg.not+'])|(?=$|'+reg.multiStops+'|'+reg.dotNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
     multiWord: reg.delimitStart + reg.combiTag + '(?:' + reg.multiBase + ')',
