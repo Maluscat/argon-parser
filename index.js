@@ -74,20 +74,31 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     }
     reg.singleNot = '(?![' + reg.singleNot + '])';
   })();
-  reg.group = { //n = not grouped, g = grouped
-    n: '(?:' + reg.attr.start[0] + reg.attr.value[0] + reg.attr.end[0] + '|' + reg.attr.start[1] + reg.attr.value[1] + reg.attr.end[1] + ')',
-    g: '(?:' + reg.attr.start[0] + '(' + reg.attr.value[0] + ')' + reg.attr.end[0] + '|' + reg.attr.start[1] + '(' + reg.attr.value[1] + ')' + reg.attr.end[1] + ')'
-  }
-  reg.ref = reg.href.case + reg.href.amplfr + '(?:' + reg.href.not + '*?|' + reg.group.n + ')';
-  reg.attrib = '(?:' + reg.ref + ')?(?::' + reg.attr.name + reg.group.n + '?)';
+  reg.attrGroup = {};
+  (function() {
+    for (var i = 0; i < 2; i++) {
+      //n = not grouped, g = grouped
+      const target = i === 0 ? 'n' : 'g';
+      const val = reg.attr.value;
+      if (target == 'g')
+        for (var n = 0; n < val.length; n++) val[n] = '(' + val[n] + ')';
+      reg.attrGroup[target] = '(?:';
+      for (var n = 0; n < reg.attr.start.length; n++) {
+        reg.attrGroup[target] += reg.attr.start[n] + val[n] + reg.attr.end[n] + (n != reg.attr.start.length - 1 ? '|' : '');
+      }
+      reg.attrGroup[target] += ')';
+    }
+  })();
+  reg.ref = reg.href.case + reg.href.amplfr + '(?:' + reg.href.not + '*?|' + reg.attrGroup.n + ')';
+  reg.attrib = '(?:' + reg.ref + ')?(?::' + reg.attr.name + reg.attrGroup.n + '?)';
   reg.base = '(' + reg.tag + ')(' + reg.attrib + '*)';
   reg.combiTag = '(?!-)((?:' + reg.tag + reg.attrib + '*\\+)*)' + reg.base;
 
   //Holding all parsing relevant expressions
   const rgx = {
     placeholder: '\\$' + reg.flags + '?|{([\\d\\D]+)}' + reg.flags,
-    attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.group.g + '?)(?=:|$)',
-    ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.group.g + ')',
+    attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.attrGroup.g + '?)(?=:|$)',
+    ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.attrGroup.g + ')',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
     singleWord: reg.delimitStart + reg.combiTag + '\\/\\/' + reg.singleNot + '(?:'+reg.empty+'([^'+reg.not+']+?)(?:'+reg.delimiter+'(?=[^'+reg.not+'])|(?=$|'+reg.multiStops+'|'+reg.dotNot+'|['+reg.not+']))|' + reg.singlePlus + ')',
     multiWord: reg.delimitStart + reg.combiTag + '(?:' + reg.multiBase + ')',
