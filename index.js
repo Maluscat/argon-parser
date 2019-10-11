@@ -7,8 +7,8 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     attr: {
       name: '[\\w-${}]+',
       value: [
-        '[^()]+',
-        '[^\\[\\]]+'
+        '(?:(?!\\):).)+?',
+        '(?:(?!\\]:).)+?'
       ],
       start: [
         '\\(',
