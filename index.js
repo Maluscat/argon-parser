@@ -31,7 +31,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       ],
       end: [
         '\\>',
-        '\\}',
+        '\\}'
       ]
     },
     bracket: {
