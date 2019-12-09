@@ -45,13 +45,14 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       ]
     },
     empty: '\\.|',
-    tag: '[\\w-]',
+    escape: '~',
+    tag: '\\w-',
     not: "\\s,?!:'()\\[\\]",
     delimiter: '\\|',
     flags: '(?:{((?:\\w+;?)+?)})'
   };
-  reg.delimitStart = '(' + reg.tag + reg.delimiter + ')?';
-  reg.tag += '+'; //Reusing the variable
+  reg.delimitStart = '([' + reg.tag + reg.escape + ']' + reg.delimiter + ')?';
+  reg.tag = '[' + reg.tag + ']+'; //Reusing the variable
   reg.multiStops = '\\/\\/';
   (function() {
     reg.multiStops += '[';
@@ -92,7 +93,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
   reg.ref = reg.href.case + reg.href.amplfr + '(?:' + reg.href.not + '*?|' + reg.attrGroup.n + ')';
   reg.attrib = '(?:' + reg.ref + ')?(?::' + reg.attr.name + reg.attrGroup.n + '?)';
   reg.base = '(' + reg.tag + ')(' + reg.attrib + '*)';
-  reg.combiTag = '(?!-)((?:' + reg.tag + reg.attrib + '*\\+)*)' + reg.base;
+  reg.combiTag = '(' + reg.escape + ')?(?!-)((?:' + reg.tag + reg.attrib + '*\\+)*)' + reg.base;
 
   //Holding all parsing relevant expressions
   const rgx = {
@@ -197,12 +198,28 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
         });
       } else return '';
     },
-    baseTag: function(str, expr, dry) {
-      return str.replace(expr, function(match, delimited, combiTags, tag, attr, value, value2, value3) {
+    baseTag: function(str, expr, dry, multiEsc) {
+      let strLenAdd = 0;
+      return str.replace(expr, function(match, delimited, escaped, combiTags, tag, attr, value, value2, value3) {
+        //value3 is the substring position when this function is testing multiWord
         const content = value != null ? value : (value2 != null ? value2 : (typeof value3 == 'string' ? value3 : ''));
         //This is a workaround to the badly supported RegExp lookbehinds, an ES2018 feature
         const leading = delimited ? delimited.slice(0, 1) : '';
-        if (dry) {
+        if (escaped) {
+          let newMatch = match.slice(1);
+          //Because multiEsc is always and only present with multiWord, using value3 is safe here
+          if (multiEsc) {
+            for (var i = 0; i < multiEsc.length; i++) {
+              if (value3 + strLenAdd < multiEsc[i][0]) multiEsc[i][0] += 1;
+            }
+            newMatch = newMatch.slice(0, tag.length + 1) + '!' + newMatch.slice(tag.length + 1, -1) + '!' + '>';
+            multiEsc.push([
+              value3 + strLenAdd + tag.length + 1, //First '!' index
+              newMatch.length - tag.length - 3 //length until last '!'
+            ]);
+          }
+          return leading + newMatch;
+        } else if (dry) {
           return leading + content;
         } else {
           attr = comp.attributes(attr, content);
@@ -215,7 +232,17 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
               return '<' + extraTag + attribs + '>';
             }) + startTag;
           }
-          return leading + startTag + content + endTag;
+          const result = leading + startTag + content + endTag;
+          strLenAdd += result.length - match.length;
+          if (multiEsc) {
+            for (var i = 0; i < multiEsc.length; i++) {
+              if (value3 + match.length < multiEsc[i][0])
+                multiEsc[i][0] += strLenAdd;
+              else
+                multiEsc[i][0] += strLenAdd - (endTag.length - "//>".length);
+            }
+          }
+          return result;
         }
       });
     },
@@ -223,9 +250,13 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       return comp.baseTag(str, rgx.singleWord, dry);
     },
     multiWord: function(str, dry) {
+      const escIndices = new Array();
       //Indefinite looping required as tags can be nested, leading to an imprecise global match
       while(rgx.multiWord.test(str)) {
-        str = comp.baseTag(str, rgx.multiWord, dry);
+        str = comp.baseTag(str, rgx.multiWord, dry, escIndices);
+      }
+      for (let i = 0; i < escIndices.length; i++) {
+        str = str.slice(0, escIndices[i][0]) + str.slice(escIndices[i][0] + 1, escIndices[i][0] + escIndices[i][1]) + str.slice(escIndices[i][0] + escIndices[i][1] + 1);
       }
       return str;
     },
