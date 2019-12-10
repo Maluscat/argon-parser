@@ -45,7 +45,7 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       ]
     },
     empty: '\\.|',
-    all: '' + reg.all + '',
+    all: '[\\d\\D]',
     tag: '\\w-',
     not: "\\s,?!:'()\\[\\]",
     delimiter: '\\|',
