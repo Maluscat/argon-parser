@@ -51,28 +51,28 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     delimiter: '\\|',
     flags: '(?:{((?:\\w+;?)+?)})'
   };
-
+  //Note to self: delimitStart HAS to be put above the reg.tag redeclaration (commit f201e5d and following)
   reg.delimitStart = '([' + reg.tag + reg.esc.char + ']' + reg.delimiter + ')?';
   reg.tag = '[' + reg.tag + ']+'; //Reusing the variable
+  reg.dotNot = '\\.(?:$|[' + reg.not + '.|' + '])';
 
-  reg.multiStops = '\\/\\/';
   (function() {
+    reg.multiStops = '\\/\\/';
     reg.multiStops += '[';
     for (var i = 0; i < reg.multi.end.length; i++) reg.multiStops += reg.multi.end[i];
     reg.multiStops += ']';
   })();
 
-  reg.dotNot = '\\.(?:$|[' + reg.not + '.|' + '])';
-  reg.singlePlus = '';
   (function() {
+    reg.singlePlus = '';
     for (var i = 0; i < reg.bracket.start.length; i++) {
       reg.singlePlus += '(' + reg.bracket.start[i] + '(?:(?!' + reg.dotNot + ')[^' + reg.not + '])+?' + reg.bracket.end[i] + ')' + (i < reg.bracket.start.length - 1 ? '|' : '');
     }
   })();
 
-  reg.singleNot = '';
-  reg.multiBase = '';
   (function() { //Constructing the syntax variations at multiWord tags
+    reg.singleNot = '';
+    reg.multiBase = '';
     for (var i = 0; i < reg.multi.start.length; i++) {
       reg.singleNot += reg.multi.end[i];
       reg.multiBase += reg.multi.start[i] + '\\/\\/((?:' + reg.all + '(?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i] + (i < reg.multi.start.length - 1 ? '|' : '');
@@ -80,8 +80,8 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
     reg.singleNot = '(?![' + reg.singleNot + '])';
   })();
 
-  reg.attrGroup = {};
   (function() {
+    reg.attrGroup = {};
     for (var i = 0; i < 2; i++) {
       //n = not grouped, g = grouped
       const target = i === 0 ? 'n' : 'g';
