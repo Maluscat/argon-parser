@@ -45,20 +45,23 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       ]
     },
     empty: '\\.|',
-    escape: '~',
+    all: '' + reg.all + '',
     tag: '\\w-',
     not: "\\s,?!:'()\\[\\]",
     delimiter: '\\|',
     flags: '(?:{((?:\\w+;?)+?)})'
   };
-  reg.delimitStart = '([' + reg.tag + reg.escape + ']' + reg.delimiter + ')?';
+
+  reg.delimitStart = '([' + reg.tag + reg.esc.char + ']' + reg.delimiter + ')?';
   reg.tag = '[' + reg.tag + ']+'; //Reusing the variable
+
   reg.multiStops = '\\/\\/';
   (function() {
     reg.multiStops += '[';
     for (var i = 0; i < reg.multi.end.length; i++) reg.multiStops += reg.multi.end[i];
     reg.multiStops += ']';
   })();
+
   reg.dotNot = '\\.(?:$|[' + reg.not + '.|' + '])';
   reg.singlePlus = '';
   (function() {
@@ -66,15 +69,17 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       reg.singlePlus += '(' + reg.bracket.start[i] + '(?:(?!' + reg.dotNot + ')[^' + reg.not + '])+?' + reg.bracket.end[i] + ')' + (i < reg.bracket.start.length - 1 ? '|' : '');
     }
   })();
+
   reg.singleNot = '';
   reg.multiBase = '';
   (function() { //Constructing the syntax variations at multiWord tags
     for (var i = 0; i < reg.multi.start.length; i++) {
       reg.singleNot += reg.multi.end[i];
-      reg.multiBase += reg.multi.start[i] + '\\/\\/((?:[\\d\\D](?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i] + (i < reg.multi.start.length - 1 ? '|' : '');
+      reg.multiBase += reg.multi.start[i] + '\\/\\/((?:' + reg.all + '(?!'+reg.multi.start[i]+'\\/\\/))*?)\\/\\/' + reg.multi.end[i] + (i < reg.multi.start.length - 1 ? '|' : '');
     }
     reg.singleNot = '(?![' + reg.singleNot + '])';
   })();
+
   reg.attrGroup = {};
   (function() {
     for (var i = 0; i < 2; i++) {
@@ -90,14 +95,15 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       reg.attrGroup[target] += ')';
     }
   })();
+
   reg.ref = reg.href.case + reg.href.amplfr + '(?:' + reg.href.not + '*?|' + reg.attrGroup.n + ')';
   reg.attrib = '(?:' + reg.ref + ')?(?::' + reg.attr.name + reg.attrGroup.n + '?)';
   reg.base = '(' + reg.tag + ')(' + reg.attrib + '*)';
-  reg.combiTag = '(' + reg.escape + ')?(?!-)((?:' + reg.tag + reg.attrib + '*\\+)*)' + reg.base;
+  reg.combiTag = '(' + reg.esc.char + ')?(?!-)((?:' + reg.tag + reg.attrib + '*\\+)*)' + reg.base;
 
   //Holding all parsing relevant expressions
   const rgx = {
-    placeholder: '\\$' + reg.flags + '?|{([\\d\\D]+)}' + reg.flags,
+    placeholder: '\\$' + reg.flags + '?|{(' + reg.all + '+)}' + reg.flags,
     attributes: '(?:(' + reg.ref + ')|:(' + reg.attr.name + ')' + reg.attrGroup.g + '?)(?=:|$)',
     ref: reg.href.case + '(' + reg.href.amplfr + ')(?:(' + reg.href.not + '*)|' + reg.attrGroup.g + ')$',
     combiTags: '(?:(' + reg.tag + ')(' + reg.attrib + '*)\\+)',
