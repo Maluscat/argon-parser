@@ -44,6 +44,9 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
         '\\]'
       ]
     },
+    esc: {
+      char: '~'
+    },
     empty: '\\.|',
     all: '[\\d\\D]',
     tag: '\\w-',
@@ -205,26 +208,35 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
       } else return '';
     },
     baseTag: function(str, expr, dry, multiEsc) {
-      let strLenAdd = 0;
+      let indexOffset = 0;
       return str.replace(expr, function(match, delimited, escaped, combiTags, tag, attr, value, value2, value3) {
         //value3 is the substring position when this function is testing multiWord
         const content = value != null ? value : (value2 != null ? value2 : (typeof value3 == 'string' ? value3 : ''));
         //This is a workaround to the badly supported RegExp lookbehinds, an ES2018 feature
         const leading = delimited ? delimited.slice(0, 1) : '';
         if (escaped) {
-          let newMatch = match.slice(1);
+          match = match.slice(1);
           //Because multiEsc is always and only present with multiWord, using value3 is safe here
           if (multiEsc) {
-            for (var i = 0; i < multiEsc.length; i++) {
-              if (value3 + strLenAdd < multiEsc[i][0]) multiEsc[i][0] += 1;
+            match = match.slice(0, tag.length + 1) + '!' + match.slice(tag.length + 1, -1) + '!' + '>';
+            const indices = [
+              value3 + indexOffset + tag.length + 1, //First '!' index
+              match.length - tag.length - 3 //length until last '!'
+            ];
+            multiEsc.push(indices);
+            for (var i = 0; i < multiEsc.length - 1; i++) {
+              //TODO: move into indexOffset?
+              //TODO: understand this
+              if (multiEsc[i][0] > indices[0] && multiEsc[i][0] + multiEsc[i][1] < indices[0] + indices[1]) {
+                indices[1] -= 2; //-2 removed !
+              } else if (multiEsc[i][0] > indices[0]) {
+                multiEsc[i][0] += 1; //-1 removed ~, +2 added !
+              } else if (multiEsc[i][0] < indices[0]) {
+                indices[0] -= 1; //?
+              }
             }
-            newMatch = newMatch.slice(0, tag.length + 1) + '!' + newMatch.slice(tag.length + 1, -1) + '!' + '>';
-            multiEsc.push([
-              value3 + strLenAdd + tag.length + 1, //First '!' index
-              newMatch.length - tag.length - 3 //length until last '!'
-            ]);
           }
-          return leading + newMatch;
+          return leading + match;
         } else if (dry) {
           return leading + content;
         } else {
@@ -239,13 +251,13 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
             }) + startTag;
           }
           const result = leading + startTag + content + endTag;
-          strLenAdd += result.length - match.length;
+          indexOffset += result.length - match.length;
           if (multiEsc) {
             for (var i = 0; i < multiEsc.length; i++) {
               if (value3 + match.length < multiEsc[i][0])
-                multiEsc[i][0] += strLenAdd;
+                multiEsc[i][0] += indexOffset;
               else
-                multiEsc[i][0] += strLenAdd - (endTag.length - "//>".length);
+                multiEsc[i][0] += indexOffset - (endTag.length - 3); //3 == "//>".length
             }
           }
           return result;
@@ -262,7 +274,10 @@ const obj = (typeof exports != 'undefined' && exports != null ? exports : argon)
         str = comp.baseTag(str, rgx.multiWord, dry, escIndices);
       }
       for (let i = 0; i < escIndices.length; i++) {
-        str = str.slice(0, escIndices[i][0]) + str.slice(escIndices[i][0] + 1, escIndices[i][0] + escIndices[i][1]) + str.slice(escIndices[i][0] + escIndices[i][1] + 1);
+        str =
+          str.slice(0, escIndices[i][0]) +
+          str.slice(escIndices[i][0] + 1, escIndices[i][0] + escIndices[i][1]) +
+          str.slice(escIndices[i][0] + escIndices[i][1] + 1);
       }
       return str;
     },
